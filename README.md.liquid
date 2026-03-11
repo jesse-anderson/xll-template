@@ -1,0 +1,44 @@
+# {{addin_display_name}}
+
+Excel XLL add-in built with Rust.
+
+## Build
+
+```sh
+cargo build --release
+```
+
+The output is `target/release/{{project-name}}.xll`.
+
+## Install
+
+1. Open Excel
+2. Go to **File > Options > Add-ins**
+3. At the bottom, select **Excel Add-ins** and click **Go...**
+4. Click **Browse...** and select the `.xll` file
+5. Click **OK**
+
+## Functions
+
+| Excel Function | Description |
+|---------------|-------------|
+{% if function_prefix != "" %}| `={{function_prefix | upcase}}_ADD(a, b)` | Adds two numbers |
+| `={{function_prefix | upcase}}_MULTIPLY(a, b)` | Multiplies two numbers |
+| `={{function_prefix | upcase}}_VERSION()` | Returns the add-in version |
+{% else %}| `=ADD(a, b)` | Adds two numbers |
+| `=MULTIPLY(a, b)` | Multiplies two numbers |
+| `=VERSION()` | Returns the add-in version |
+{% endif %}
+## Test
+
+```sh
+cargo build --release
+cargo test
+```
+
+## Architecture
+
+This project uses:
+- [xll-rs](https://crates.io/crates/xll-rs) - XLL runtime
+- [xllgen](https://crates.io/crates/xllgen) - Function registration macros
+- [xll-utils](https://crates.io/crates/xll-utils) - Export verification

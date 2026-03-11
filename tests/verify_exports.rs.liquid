@@ -1,0 +1,62 @@
+//! Verify that the built XLL contains all required exports.
+
+use xll_utils::exports::verify_dll_exports;
+
+fn xll_path() -> std::path::PathBuf {
+    let manifest_dir = env!("CARGO_MANIFEST_DIR");
+    // Check release first, then debug
+    let release = std::path::Path::new(manifest_dir)
+        .join("target")
+        .join("release")
+        .join("{{project-name}}.xll");
+    if release.exists() {
+        return release;
+    }
+    let debug = std::path::Path::new(manifest_dir)
+        .join("target")
+        .join("debug")
+        .join("{{project-name}}.xll");
+    if debug.exists() {
+        return debug;
+    }
+    panic!(
+        "XLL not found. Run `cargo build` or `cargo build --release` first.\n  Checked:\n    {}\n    {}",
+        release.display(),
+        debug.display()
+    );
+}
+
+/// Required Excel entry points that every XLL must export.
+const REQUIRED_EXPORTS: &[&str] = &[
+    "xlAutoOpen",
+    "xlAutoClose",
+    "xlAutoFree12",
+    "xlAddInManagerInfo12",
+];
+
+#[test]
+fn xll_has_required_entry_points() {
+    let path = xll_path();
+    let report = verify_dll_exports(&path, REQUIRED_EXPORTS).unwrap();
+    assert!(
+        report.complete,
+        "Missing required exports: {:?}",
+        report.missing
+    );
+}
+
+#[test]
+fn xll_has_user_functions() {
+    let path = xll_path();
+    let expected = &[
+        "xl_add",
+        "xl_version",
+        "xl_multiply",
+    ];
+    let report = verify_dll_exports(&path, expected).unwrap();
+    assert!(
+        report.complete,
+        "Missing user function exports: {:?}",
+        report.missing
+    );
+}

@@ -1,0 +1,31 @@
+[template]
+cargo_generate_version = ">=0.18.0"
+description = "Create a new Excel XLL add-in in Rust"
+ignore = ["cargo_gen_todo.md", ".gitattributes", "LICENSE-MIT", "LICENSE-APACHE"]
+exclude = ["build.rs", ".gitignore"]
+
+# ---------------------------------------------------------------
+# Custom placeholders - these become interactive prompts
+# ---------------------------------------------------------------
+
+[placeholders.addin_display_name]
+type = "string"
+prompt = "Display name for the add-in (shown in Excel's Add-In Manager)"
+default = "My Add-In"
+
+[placeholders.function_prefix]
+type = "string"
+prompt = "Prefix for Excel function names (e.g., 'LR' makes functions like LR_CALCULATE). Leave empty for no prefix."
+default = ""
+
+[placeholders.include_ci]
+type = "bool"
+prompt = "Include GitHub Actions CI workflow?"
+default = true
+
+# ---------------------------------------------------------------
+# Conditional file inclusion
+# ---------------------------------------------------------------
+
+[conditional.'!include_ci']
+ignore = [".github"]

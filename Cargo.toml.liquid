@@ -1,0 +1,18 @@
+[package]
+name = "{{project-name}}"
+version = "0.1.0"
+edition = "2021"
+description = "{{addin_display_name}} - Excel XLL add-in"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+xll-rs = "0.1"
+xllgen = "0.1"
+
+[build-dependencies]
+xll-rs = "0.1"
+
+[dev-dependencies]
+xll-utils = "0.1"

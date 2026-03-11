@@ -1,0 +1,43 @@
+#![allow(clippy::not_unsafe_ptr_arg_deref)]
+
+use xllgen::xll_bindgen;
+
+/// Adds two numbers.
+{%- if function_prefix != "" %}
+#[xll_bindgen(name = "{{function_prefix | upcase}}_ADD", args = "a, b", help = "Adds two numbers", threadsafe)]
+{%- else %}
+#[xll_bindgen(name = "ADD", args = "a, b", help = "Adds two numbers", threadsafe)]
+{%- endif %}
+pub fn add(a: f64, b: f64) -> f64 {
+    a + b
+}
+
+/// Multiplies two numbers.
+{%- if function_prefix != "" %}
+#[xll_bindgen(name = "{{function_prefix | upcase}}_MULTIPLY", args = "a, b", help = "Multiplies two numbers", threadsafe)]
+{%- else %}
+#[xll_bindgen(name = "MULTIPLY", args = "a, b", help = "Multiplies two numbers", threadsafe)]
+{%- endif %}
+pub fn multiply(a: f64, b: f64) -> f64 {
+    a * b
+}
+
+/// Returns the add-in version string.
+{%- if function_prefix != "" %}
+#[xll_bindgen(name = "{{function_prefix | upcase}}_VERSION", help = "Returns add-in version", threadsafe)]
+{%- else %}
+#[xll_bindgen(name = "VERSION", help = "Returns add-in version", threadsafe)]
+{%- endif %}
+pub fn version() -> String {
+    env!("CARGO_PKG_VERSION").to_string()
+}
+
+// Generates the required Excel entry points:
+//   xlAutoOpen       - called when Excel loads the XLL
+//   xlAutoClose      - called when Excel unloads the XLL
+//   xlAutoFree12     - called to free memory allocated by UDFs
+//   xlAddInManagerInfo12 - provides add-in name to Excel's Add-In Manager
+xllgen::xll_auto_open!(
+    prefix = "{{crate_name | upcase}}",
+    addin = "{{addin_display_name}}"
+);
