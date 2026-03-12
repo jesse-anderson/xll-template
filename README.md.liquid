@@ -20,15 +20,15 @@ The output is `target/release/{{project-name}}.xll`.
 
 ## Functions
 
-| Excel Function | Description |
-|---------------|-------------|
-{% if function_prefix != "" %}| `={{function_prefix | upcase}}_ADD(a, b)` | Adds two numbers |
-| `={{function_prefix | upcase}}_MULTIPLY(a, b)` | Multiplies two numbers |
-| `={{function_prefix | upcase}}_VERSION()` | Returns the add-in version |
-{% else %}| `=ADD(a, b)` | Adds two numbers |
-| `=MULTIPLY(a, b)` | Multiplies two numbers |
-| `=VERSION()` | Returns the add-in version |
-{% endif %}
+| Excel Function | Category | Description |
+|---------------|----------|-------------|
+| `={{crate_name | upcase}}.ADD(a, b)` | {{crate_name}} | Adds two numbers |
+| `={{crate_name | upcase}}.MULTIPLY(a, b)` | {{crate_name}} | Multiplies two numbers |
+| `=Stats.MEAN(values)` | Stats | Mean of a range |
+| `=Sys.VERSION()` | Sys | Returns add-in version |
+| `=Sys.NOW_MS()` | Sys | Milliseconds since UNIX epoch (volatile) |
+
+
 ## Test
 
 ```sh

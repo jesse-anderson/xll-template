@@ -1,42 +1,60 @@
 #![allow(clippy::not_unsafe_ptr_arg_deref)]
 
 use xllgen::xll_bindgen;
+use xll_rs::types::{XllError, XLLError};
+
+// ---------------------------------------------------------------------------
+// Math functions - category: {{crate_name}}
+// ---------------------------------------------------------------------------
 
 /// Adds two numbers.
-{%- if function_prefix != "" %}
-#[xll_bindgen(name = "{{function_prefix | upcase}}_ADD", args = "a, b", help = "Adds two numbers", threadsafe)]
-{%- else %}
-#[xll_bindgen(name = "ADD", args = "a, b", help = "Adds two numbers", threadsafe)]
-{%- endif %}
+#[xll_bindgen(name = "ADD", category = "{{crate_name}}", args = "a, b", help = "Adds two numbers", threadsafe)]
 pub fn add(a: f64, b: f64) -> f64 {
     a + b
 }
 
 /// Multiplies two numbers.
-{%- if function_prefix != "" %}
-#[xll_bindgen(name = "{{function_prefix | upcase}}_MULTIPLY", args = "a, b", help = "Multiplies two numbers", threadsafe)]
-{%- else %}
-#[xll_bindgen(name = "MULTIPLY", args = "a, b", help = "Multiplies two numbers", threadsafe)]
-{%- endif %}
+#[xll_bindgen(name = "MULTIPLY", category = "{{crate_name}}", args = "a, b", help = "Multiplies two numbers", threadsafe)]
 pub fn multiply(a: f64, b: f64) -> f64 {
     a * b
 }
 
+// ---------------------------------------------------------------------------
+// Stats functions - category: Stats
+// ---------------------------------------------------------------------------
+
+/// Returns the mean of a range of values.
+#[xll_bindgen(name = "Stats.MEAN", category = "Stats", args = "values", help = "Mean of a range", threadsafe)]
+pub fn stats_mean(values: Vec<f64>) -> Result<f64, XllError> {
+    if values.is_empty() {
+        return Err(XllError::msg(XLLError::VALUE, "empty input"));
+    }
+    Ok(values.iter().sum::<f64>() / values.len() as f64)
+}
+
+// ---------------------------------------------------------------------------
+// Sys functions - category: Sys
+// ---------------------------------------------------------------------------
+
 /// Returns the add-in version string.
-{%- if function_prefix != "" %}
-#[xll_bindgen(name = "{{function_prefix | upcase}}_VERSION", help = "Returns add-in version", threadsafe)]
-{%- else %}
-#[xll_bindgen(name = "VERSION", help = "Returns add-in version", threadsafe)]
-{%- endif %}
+#[xll_bindgen(name = "Sys.VERSION", category = "Sys", help = "Returns add-in version", threadsafe)]
 pub fn version() -> String {
     env!("CARGO_PKG_VERSION").to_string()
 }
 
-// Generates the required Excel entry points:
-//   xlAutoOpen       - called when Excel loads the XLL
-//   xlAutoClose      - called when Excel unloads the XLL
-//   xlAutoFree12     - called to free memory allocated by UDFs
-//   xlAddInManagerInfo12 - provides add-in name to Excel's Add-In Manager
+/// Returns milliseconds since UNIX epoch. Recalculates on every sheet change.
+#[xll_bindgen(name = "Sys.NOW_MS", category = "Sys", help = "Milliseconds since UNIX epoch", volatile)]
+pub fn now_ms() -> Result<f64, XllError> {
+    let now = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_err(|_| XllError::new(XLLError::VALUE))?;
+    Ok(now.as_secs_f64() * 1000.0)
+}
+
+// ---------------------------------------------------------------------------
+// Entry points
+// ---------------------------------------------------------------------------
+
 xllgen::xll_auto_open!(
     prefix = "{{crate_name | upcase}}",
     addin = "{{addin_display_name}}"

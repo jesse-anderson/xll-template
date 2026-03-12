@@ -13,11 +13,6 @@ type = "string"
 prompt = "Display name for the add-in (shown in Excel's Add-In Manager)"
 default = "My Add-In"
 
-[placeholders.function_prefix]
-type = "string"
-prompt = "Prefix for Excel function names (e.g., 'LR' makes functions like LR_CALCULATE). Leave empty for no prefix."
-default = ""
-
 [placeholders.include_ci]
 type = "bool"
 prompt = "Include GitHub Actions CI workflow?"

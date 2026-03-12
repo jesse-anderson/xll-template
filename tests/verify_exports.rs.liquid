@@ -50,13 +50,49 @@ fn xll_has_user_functions() {
     let path = xll_path();
     let expected = &[
         "xl_add",
-        "xl_version",
         "xl_multiply",
+        "xl_stats_mean",
+        "xl_version",
+        "xl_now_ms",
     ];
     let report = verify_dll_exports(&path, expected).unwrap();
     assert!(
         report.complete,
         "Missing user function exports: {:?}",
         report.missing
+    );
+}
+
+/// Verify that the Excel-visible registration names are embedded in the binary.
+#[test]
+fn xll_has_registration_names() {
+    let path = xll_path();
+    let bytes = std::fs::read(&path).expect("Failed to read XLL binary");
+
+    let expected_names: &[&str] = &[
+        "ADD",
+        "MULTIPLY",
+        "Stats.MEAN",
+        "Sys.VERSION",
+        "Sys.NOW_MS",
+    ];
+
+    let mut missing = Vec::new();
+    for name in expected_names {
+        if !bytes
+            .windows(name.len())
+            .any(|w| w == name.as_bytes())
+        {
+            missing.push(*name);
+        }
+    }
+
+    assert!(
+        missing.is_empty(),
+        "Registration names not found in XLL binary: {:?}\n  \
+         These names should appear in Excel after loading the add-in.\n  \
+         Checked: {}",
+        missing,
+        path.display()
     );
 }

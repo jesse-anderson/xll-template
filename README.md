@@ -29,7 +29,6 @@ You'll be prompted for:
 | Prompt | Description | Default |
 |--------|-------------|---------|
 | **Display name** | Name shown in Excel's Add-In Manager | `My Add-In` |
-| **Function prefix** | Prefix for Excel function names (e.g., `LR` produces `LR_ADD`) | *(empty)* |
 | **Include CI** | Add a GitHub Actions workflow for building and releasing | `true` |
 
 Or skip the prompts:
@@ -37,7 +36,6 @@ Or skip the prompts:
 ```sh
 cargo generate gh:jesse-anderson/xll-template --name my-addin \
   --define addin_display_name="My Add-In" \
-  --define function_prefix="LR" \
   --define include_ci=true
 ```
 
@@ -48,7 +46,7 @@ my-addin/
 ├── Cargo.toml          # Project manifest with xll-rs, xllgen, xll-utils deps
 ├── build.rs            # Build script - renames .dll to .xll
 ├── src/
-│   └── lib.rs          # XLL source with example functions (ADD, MULTIPLY, VERSION)
+│   └── lib.rs          # XLL source with example functions across multiple categories
 ├── tests/
 │   └── verify_exports.rs  # Export verification tests
 ├── .github/workflows/  # (if CI enabled)
@@ -83,7 +81,9 @@ cargo test
 4. Click **Browse...** and select the `.xll` file
 5. Click **OK**
 
-Your functions (e.g., `=ADD(1, 2)` or `=LR_ADD(1, 2)` if you set a prefix) are now available in any cell.
+Your functions are now available in any cell. With `--name my-addin`, try `=MY_ADDIN.ADD(1, 2)`.
+
+Functions are namespaced under the crate name. For custom namespaces within one XLL, use dotted names in `#[xll_bindgen]` (e.g., `name = "Stats.MEAN"`).
 
 ## Built With
 
